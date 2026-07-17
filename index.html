@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="《诛仙世界》S4 天工机巧盘拼图求解工具：按等级和机巧石库存生成铺满方案。"
+    />
+    <title>天工机巧盘 · 拼图推演</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-glow page-glow-left" aria-hidden="true"></div>
+    <div class="page-glow page-glow-right" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="返回工具顶部">
+          <span class="brand-seal" aria-hidden="true">巧</span>
+          <span>
+            <strong>天工机巧盘</strong>
+            <small>S4 · 拼图推演</small>
+          </span>
+        </a>
+
+        <div class="season-mark" aria-label="诛仙世界 S4 赛季工具">
+          <span class="season-line"></span>
+          <span>诛仙世界</span>
+          <b>S4</b>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="main-title">
+          <div class="hero-kicker"><span></span> TIAN GONG JI QIAO <span></span></div>
+          <h1 id="main-title">一盘有解，落子有序</h1>
+          <p>选定机巧盘等级，录入你拥有的五类机巧石，自动推演恰好铺满的摆放方案。</p>
+
+          <ol class="steps" aria-label="使用步骤">
+            <li class="active"><b>01</b><span>选择盘级</span></li>
+            <li><b>02</b><span>录入石数</span></li>
+            <li><b>03</b><span>查看解法</span></li>
+          </ol>
+        </section>
+
+        <section class="workspace" aria-label="机巧盘求解工作区">
+          <aside class="control-panel">
+            <section class="control-section level-section">
+              <div class="section-title-row">
+                <div>
+                  <span class="section-index">01</span>
+                  <h2>机巧盘等级</h2>
+                </div>
+                <span id="cellCountBadge" class="soft-badge">24 格</span>
+              </div>
+              <div id="levelPicker" class="level-picker" role="radiogroup" aria-label="选择机巧盘等级"></div>
+              <p id="levelHint" class="field-hint"></p>
+            </section>
+
+            <div class="carved-divider" aria-hidden="true"><span>◆</span></div>
+
+            <section class="control-section inventory-section">
+              <div class="section-title-row">
+                <div>
+                  <span class="section-index">02</span>
+                  <h2>机巧石数量</h2>
+                </div>
+                <button id="exampleButton" class="text-button" type="button">填入示例</button>
+              </div>
+
+              <div id="shapeInventory" class="shape-inventory"></div>
+
+              <div class="inventory-summary" aria-live="polite">
+                <div>
+                  <span>已选机巧石</span>
+                  <strong><b id="selectedCount">0</b> / <b id="neededCount">6</b> 块</strong>
+                </div>
+                <div class="summary-track" aria-hidden="true"><span id="summaryProgress"></span></div>
+                <p id="inventoryMessage">还需选择 6 块机巧石</p>
+              </div>
+
+              <button id="solveButton" class="solve-button" type="button" disabled>
+                <span class="button-spark" aria-hidden="true">✦</span>
+                <span>开始推演</span>
+                <small>生成铺满方案</small>
+              </button>
+
+              <p class="rule-note">
+                <span aria-hidden="true">↻</span>
+                机巧石可旋转，不可镜像；左右弯石分别计数。
+              </p>
+            </section>
+          </aside>
+
+          <section class="result-panel" aria-labelledby="result-heading">
+            <div class="result-head">
+              <div>
+                <span class="section-index">03</span>
+                <div>
+                  <h2 id="result-heading">推演结果</h2>
+                  <p id="resultSubtitle">录入数量后，方案将在此呈现</p>
+                </div>
+              </div>
+
+              <div id="solutionNav" class="solution-nav" hidden>
+                <button id="previousSolution" type="button" aria-label="上一个方案">‹</button>
+                <span>方案 <b id="solutionIndex">1</b> / <b id="solutionTotal">1</b></span>
+                <button id="nextSolution" type="button" aria-label="下一个方案">›</button>
+              </div>
+            </div>
+
+            <div class="board-stage">
+              <div class="stage-ornament stage-ornament-top" aria-hidden="true">◇ ─── ✦ ─── ◇</div>
+              <div id="board" class="board" role="img" aria-label="机巧盘棋盘"></div>
+              <div id="emptyState" class="empty-state">
+                <span class="empty-glyph" aria-hidden="true">卦</span>
+                <strong>静候推演</strong>
+                <p>左侧录入机巧石，数量吻合后即可开始</p>
+              </div>
+              <div class="stage-ornament stage-ornament-bottom" aria-hidden="true">◇ ─── ✦ ─── ◇</div>
+            </div>
+
+            <div id="resultMessage" class="result-message" hidden aria-live="polite"></div>
+
+            <section id="placementGuide" class="placement-guide" hidden aria-labelledby="guide-title">
+              <div class="guide-heading">
+                <div>
+                  <h3 id="guide-title">落石次序</h3>
+                  <p>编号与盘面一致；行列均从左上角开始计数</p>
+                </div>
+                <span id="solveStats" class="solve-stats"></span>
+              </div>
+              <div id="placementList" class="placement-list"></div>
+            </section>
+          </section>
+        </section>
+
+        <section class="feature-strip" aria-label="工具特点">
+          <article>
+            <span aria-hidden="true">◎</span>
+            <div><strong>精确铺满</strong><p>不重叠、不越界、不留空格</p></div>
+          </article>
+          <article>
+            <span aria-hidden="true">↻</span>
+            <div><strong>自动旋转</strong><p>穷举每类机巧石的合法朝向</p></div>
+          </article>
+          <article>
+            <span aria-hidden="true">多</span>
+            <div><strong>多解浏览</strong><p>同一库存可前后切换不同摆法</p></div>
+          </article>
+        </section>
+      </main>
+
+      <footer>
+        <span>非官方玩家工具 · 数据与规则可持续校准</span>
+        <span>天工有矩，机巧无穷</span>
+      </footer>
+    </div>
+
+    <script src="./solver-core.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

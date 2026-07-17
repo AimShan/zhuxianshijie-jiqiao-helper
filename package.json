@@ -1,0 +1,9 @@
+{
+  "name": "zhuxian-jijiao-solver",
+  "version": "1.0.0",
+  "private": true,
+  "description": "《诛仙世界》S4 天工机巧盘拼图求解工具",
+  "scripts": {
+    "test": "node --test tests/solver.test.js"
+  }
+}
