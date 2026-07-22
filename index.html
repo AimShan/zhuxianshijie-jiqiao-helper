@@ -52,7 +52,7 @@
                   <span class="section-index">01</span>
                   <h2>机巧盘等级</h2>
                 </div>
-                <span id="cellCountBadge" class="soft-badge">24 格</span>
+                <span id="cellCountBadge" class="soft-badge">28 格</span>
               </div>
               <div id="levelPicker" class="level-picker" role="radiogroup" aria-label="选择机巧盘等级"></div>
               <p id="levelHint" class="field-hint"></p>
@@ -83,10 +83,10 @@
               <div class="inventory-summary" aria-live="polite">
                 <div>
                   <span>已选机巧石</span>
-                  <strong><b id="selectedCount">0</b> / <b id="neededCount">6</b> 块</strong>
+                  <strong><b id="selectedCount">0</b> / <b id="neededCount">7</b> 块</strong>
                 </div>
                 <div class="summary-track" aria-hidden="true"><span id="summaryProgress"></span></div>
-                <p id="inventoryMessage">还需选择 6 块机巧石</p>
+                <p id="inventoryMessage">还需选择 7 块机巧石</p>
               </div>
 
               <button id="solveButton" class="solve-button" type="button" disabled>
@@ -170,8 +170,11 @@
     <script src="./solver-core.js"></script>
     <script src="./app.js"></script>
     <script>
-      (function setupClearInventoryButton() {
+      (function setupPageDefaults() {
         "use strict";
+
+        const defaultLevelButton = document.querySelector('[data-level-index="3"]');
+        if (defaultLevelButton) defaultLevelButton.click();
 
         const clearButton = document.querySelector("#clearInventoryButton");
         const exampleButton = document.querySelector("#exampleButton");
