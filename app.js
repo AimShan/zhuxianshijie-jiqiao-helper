@@ -1,8 +1,8 @@
 (function startApp() {
   "use strict";
 
-  const { SHAPES, BOARD_LEVELS, solveBoard } = window.JijiaoSolver;
-  const CHINESE_NUMERALS = ["壹", "贰", "叁", "肆", "伍", "陆"];
+  const { SHAPES, BOARD_LEVELS, BOARD_TEMPLATE_CELLS, solveBoard } = window.JijiaoSolver;
+  const CHINESE_NUMERALS = ["壹", "贰", "叁", "肆", "伍", "陆", "柒"];
   const MAX_INVENTORY_PER_SHAPE = 99;
   const PIECE_COLORS = [
     "#72ad99",
@@ -50,14 +50,14 @@
   };
 
   const state = {
-    levelIndex: 2,
+    levelIndex: 3,
     inventory: Object.fromEntries(SHAPES.map((shape) => [shape.id, 0])),
     result: null,
     solutionIndex: 0,
     isSolving: false,
   };
 
-  const allBoardCells = BOARD_LEVELS[BOARD_LEVELS.length - 1].cells;
+  const allBoardCells = BOARD_TEMPLATE_CELLS;
 
   function coordinateKey(row, column) {
     return `${row},${column}`;
@@ -65,6 +65,10 @@
 
   function currentLevel() {
     return BOARD_LEVELS[state.levelIndex];
+  }
+
+  function levelCellCount(level) {
+    return level.targetCellCount ?? level.cells.length;
   }
 
   function requiredPieceCount() {
@@ -107,23 +111,27 @@
   function renderLevelPicker() {
     elements.levelPicker.replaceChildren();
     BOARD_LEVELS.forEach((level, index) => {
+      const isLocked = Boolean(level.locked);
+      const cellCount = levelCellCount(level);
       const button = document.createElement("button");
       button.type = "button";
       button.className = `level-button${index === state.levelIndex ? " active" : ""}${
-        level.confirmed ? "" : " unconfirmed"
-      }`;
+        !level.confirmed && !isLocked ? " unconfirmed" : ""
+      }${isLocked ? " locked" : ""}`;
       button.dataset.levelIndex = String(index);
+      button.disabled = isLocked;
       button.setAttribute("role", "radio");
       button.setAttribute("aria-checked", index === state.levelIndex ? "true" : "false");
+      button.setAttribute("aria-disabled", isLocked ? "true" : "false");
       button.setAttribute(
         "aria-label",
-        `${level.level} 级机巧盘，${level.cells.length} 格${level.confirmed ? "" : "，格位待校准"}`,
+        `${level.level} 级机巧盘，${cellCount} 格${isLocked ? "，开放位置待确认" : ""}`,
       );
 
       const numeral = document.createElement("b");
       numeral.textContent = CHINESE_NUMERALS[index];
       const count = document.createElement("small");
-      count.textContent = String(level.cells.length);
+      count.textContent = String(cellCount);
       button.append(numeral, count);
       elements.levelPicker.append(button);
     });
@@ -382,7 +390,8 @@
   }
 
   function selectLevel(nextIndex) {
-    if (nextIndex === state.levelIndex) return;
+    const nextLevel = BOARD_LEVELS[nextIndex];
+    if (!nextLevel || nextLevel.locked || nextIndex === state.levelIndex) return;
     state.levelIndex = nextIndex;
     renderLevelPicker();
     updateLevelSummary();

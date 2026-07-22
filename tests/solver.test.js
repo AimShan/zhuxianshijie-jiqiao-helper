@@ -5,6 +5,7 @@ const test = require("node:test");
 const {
   SHAPES,
   BOARD_LEVELS,
+  BOARD_TEMPLATE_CELLS,
   SHAPE_ORIENTATIONS,
   solveBoard,
   validateInventory,
@@ -53,8 +54,12 @@ test("rotations are unique and do not introduce mirrored pieces", () => {
   assert.equal(SHAPE_ORIENTATIONS.right.length, 4);
 });
 
-test("configured levels progress in four-cell increments", () => {
-  assert.deepEqual(BOARD_LEVELS.map((level) => level.cells.length), [16, 20, 24, 28, 32, 36]);
+test("configured levels progress in four-cell increments to the forty-cell template", () => {
+  assert.equal(BOARD_TEMPLATE_CELLS.length, 40);
+  assert.deepEqual(
+    BOARD_LEVELS.map((level) => level.targetCellCount ?? level.cells.length),
+    [16, 20, 24, 28, 32, 36, 40],
+  );
 });
 
 test("inventory validation rejects shortages but accepts surplus backpack pieces", () => {
@@ -71,8 +76,8 @@ test("inventory validation rejects shortages but accepts surplus backpack pieces
   assert.equal(validation.surplusPieces, 4);
 });
 
-test("every configured level has a valid baseline tiling", () => {
-  BOARD_LEVELS.forEach((level) => {
+test("every confirmed level has a valid baseline tiling", () => {
+  BOARD_LEVELS.filter((level) => !level.locked).forEach((level) => {
     const inventory = emptyInventory();
     inventory.line = level.cells.length / 4;
     const result = solveBoard(level.cells, inventory, { limit: 1 });

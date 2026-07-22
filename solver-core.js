@@ -62,57 +62,81 @@
     return result;
   }
 
+  const LEVEL_FOUR_CELLS = mergeCells(
+    rectangle(1, 4, 0, 5),
+    rectangle(5, 5, 0, 3),
+  );
+
+  // 游戏实图中的完整七级外框：顶端居中 4 格，下方 6 × 6，共 40 格。
+  // 五、六级具体新增位置尚未确认，因此只作为灰色锁定模板展示。
+  const BOARD_TEMPLATE_CELLS = mergeCells(
+    rectangle(0, 0, 1, 4),
+    rectangle(1, 6, 0, 5),
+  );
+
   const BOARD_LEVELS = [
     {
       level: 1,
       name: "初启",
       cells: rectangle(1, 4, 1, 4),
+      targetCellCount: 16,
       note: "4 × 4 · 16 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 2,
       name: "拓界",
       cells: rectangle(1, 4, 0, 4),
+      targetCellCount: 20,
       note: "5 × 4 · 20 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 3,
       name: "成盘",
       cells: rectangle(1, 4, 0, 5),
+      targetCellCount: 24,
       note: "6 × 4 · 24 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 4,
       name: "引星",
-      cells: mergeCells(rectangle(1, 4, 0, 5), rectangle(5, 5, 0, 3)),
+      cells: LEVEL_FOUR_CELLS,
+      targetCellCount: 28,
       note: "底部靠左新增 4 格 · 共 28 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 5,
-      name: "承光",
-      cells: mergeCells(
-        rectangle(1, 4, 0, 5),
-        rectangle(5, 5, 0, 3),
-        rectangle(0, 0, 1, 4),
-      ),
-      note: "32 格 · 格位待实图校准",
+      name: "待开放",
+      cells: null,
+      targetCellCount: 32,
+      note: "32 格 · 开放位置待确认",
       confirmed: false,
+      locked: true,
     },
     {
       level: 6,
-      name: "圆满",
-      cells: mergeCells(
-        rectangle(1, 4, 0, 5),
-        rectangle(5, 5, 0, 3),
-        rectangle(0, 0, 1, 4),
-        rectangle(6, 6, 1, 4),
-      ),
-      note: "36 格 · 格位待实图校准",
+      name: "待开放",
+      cells: null,
+      targetCellCount: 36,
+      note: "36 格 · 开放位置待确认",
       confirmed: false,
+      locked: true,
+    },
+    {
+      level: 7,
+      name: "待开放",
+      cells: null,
+      targetCellCount: 40,
+      note: "40 格 · 开放位置待确认",
+      confirmed: false,
+      locked: true,
     },
   ];
 
@@ -387,6 +411,7 @@
   const api = {
     SHAPES,
     BOARD_LEVELS,
+    BOARD_TEMPLATE_CELLS,
     SHAPE_ORIENTATIONS,
     normalizeCells,
     getOrientations,

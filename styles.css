@@ -1,6 +1,32 @@
 @import url("./styles-clarity.css");
 
-/* 库存快捷操作 */
+/* 等级选择与库存快捷操作 */
+.level-picker {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.level-button.locked {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.level-button.locked:hover {
+  border-color: #2e3938;
+  background: #12191a;
+  color: #7c8580;
+  transform: none;
+  box-shadow: none;
+}
+
+.level-button.locked::after {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  color: #727b76;
+  font-size: 8px;
+  content: "锁";
+}
+
 .inventory-actions {
   display: flex;
   align-items: center;

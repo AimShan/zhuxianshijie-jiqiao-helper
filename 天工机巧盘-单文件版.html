@@ -1516,7 +1516,33 @@ footer span:last-child {
 }
 
 
-/* 库存快捷操作 */
+/* 等级选择与库存快捷操作 */
+.level-picker {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.level-button.locked {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.level-button.locked:hover {
+  border-color: #2e3938;
+  background: #12191a;
+  color: #7c8580;
+  transform: none;
+  box-shadow: none;
+}
+
+.level-button.locked::after {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  color: #727b76;
+  font-size: 8px;
+  content: "锁";
+}
+
 .inventory-actions {
   display: flex;
   align-items: center;
@@ -1812,57 +1838,81 @@ footer::after {
     return result;
   }
 
+  const LEVEL_FOUR_CELLS = mergeCells(
+    rectangle(1, 4, 0, 5),
+    rectangle(5, 5, 0, 3),
+  );
+
+  // 游戏实图中的完整七级外框：顶端居中 4 格，下方 6 × 6，共 40 格。
+  // 五、六级具体新增位置尚未确认，因此只作为灰色锁定模板展示。
+  const BOARD_TEMPLATE_CELLS = mergeCells(
+    rectangle(0, 0, 1, 4),
+    rectangle(1, 6, 0, 5),
+  );
+
   const BOARD_LEVELS = [
     {
       level: 1,
       name: "初启",
       cells: rectangle(1, 4, 1, 4),
+      targetCellCount: 16,
       note: "4 × 4 · 16 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 2,
       name: "拓界",
       cells: rectangle(1, 4, 0, 4),
+      targetCellCount: 20,
       note: "5 × 4 · 20 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 3,
       name: "成盘",
       cells: rectangle(1, 4, 0, 5),
+      targetCellCount: 24,
       note: "6 × 4 · 24 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 4,
       name: "引星",
-      cells: mergeCells(rectangle(1, 4, 0, 5), rectangle(5, 5, 0, 3)),
+      cells: LEVEL_FOUR_CELLS,
+      targetCellCount: 28,
       note: "底部靠左新增 4 格 · 共 28 格",
       confirmed: true,
+      locked: false,
     },
     {
       level: 5,
-      name: "承光",
-      cells: mergeCells(
-        rectangle(1, 4, 0, 5),
-        rectangle(5, 5, 0, 3),
-        rectangle(0, 0, 1, 4),
-      ),
-      note: "32 格 · 格位待实图校准",
+      name: "待开放",
+      cells: null,
+      targetCellCount: 32,
+      note: "32 格 · 开放位置待确认",
       confirmed: false,
+      locked: true,
     },
     {
       level: 6,
-      name: "圆满",
-      cells: mergeCells(
-        rectangle(1, 4, 0, 5),
-        rectangle(5, 5, 0, 3),
-        rectangle(0, 0, 1, 4),
-        rectangle(6, 6, 1, 4),
-      ),
-      note: "36 格 · 格位待实图校准",
+      name: "待开放",
+      cells: null,
+      targetCellCount: 36,
+      note: "36 格 · 开放位置待确认",
       confirmed: false,
+      locked: true,
+    },
+    {
+      level: 7,
+      name: "待开放",
+      cells: null,
+      targetCellCount: 40,
+      note: "40 格 · 开放位置待确认",
+      confirmed: false,
+      locked: true,
     },
   ];
 
@@ -2137,6 +2187,7 @@ footer::after {
   const api = {
     SHAPES,
     BOARD_LEVELS,
+    BOARD_TEMPLATE_CELLS,
     SHAPE_ORIENTATIONS,
     normalizeCells,
     getOrientations,
@@ -2153,8 +2204,8 @@ footer::after {
 (function startApp() {
   "use strict";
 
-  const { SHAPES, BOARD_LEVELS, solveBoard } = window.JijiaoSolver;
-  const CHINESE_NUMERALS = ["壹", "贰", "叁", "肆", "伍", "陆"];
+  const { SHAPES, BOARD_LEVELS, BOARD_TEMPLATE_CELLS, solveBoard } = window.JijiaoSolver;
+  const CHINESE_NUMERALS = ["壹", "贰", "叁", "肆", "伍", "陆", "柒"];
   const MAX_INVENTORY_PER_SHAPE = 99;
   const PIECE_COLORS = [
     "#72ad99",
@@ -2202,14 +2253,14 @@ footer::after {
   };
 
   const state = {
-    levelIndex: 2,
+    levelIndex: 3,
     inventory: Object.fromEntries(SHAPES.map((shape) => [shape.id, 0])),
     result: null,
     solutionIndex: 0,
     isSolving: false,
   };
 
-  const allBoardCells = BOARD_LEVELS[BOARD_LEVELS.length - 1].cells;
+  const allBoardCells = BOARD_TEMPLATE_CELLS;
 
   function coordinateKey(row, column) {
     return `${row},${column}`;
@@ -2217,6 +2268,10 @@ footer::after {
 
   function currentLevel() {
     return BOARD_LEVELS[state.levelIndex];
+  }
+
+  function levelCellCount(level) {
+    return level.targetCellCount ?? level.cells.length;
   }
 
   function requiredPieceCount() {
@@ -2259,23 +2314,27 @@ footer::after {
   function renderLevelPicker() {
     elements.levelPicker.replaceChildren();
     BOARD_LEVELS.forEach((level, index) => {
+      const isLocked = Boolean(level.locked);
+      const cellCount = levelCellCount(level);
       const button = document.createElement("button");
       button.type = "button";
       button.className = `level-button${index === state.levelIndex ? " active" : ""}${
-        level.confirmed ? "" : " unconfirmed"
-      }`;
+        !level.confirmed && !isLocked ? " unconfirmed" : ""
+      }${isLocked ? " locked" : ""}`;
       button.dataset.levelIndex = String(index);
+      button.disabled = isLocked;
       button.setAttribute("role", "radio");
       button.setAttribute("aria-checked", index === state.levelIndex ? "true" : "false");
+      button.setAttribute("aria-disabled", isLocked ? "true" : "false");
       button.setAttribute(
         "aria-label",
-        `${level.level} 级机巧盘，${level.cells.length} 格${level.confirmed ? "" : "，格位待校准"}`,
+        `${level.level} 级机巧盘，${cellCount} 格${isLocked ? "，开放位置待确认" : ""}`,
       );
 
       const numeral = document.createElement("b");
       numeral.textContent = CHINESE_NUMERALS[index];
       const count = document.createElement("small");
-      count.textContent = String(level.cells.length);
+      count.textContent = String(cellCount);
       button.append(numeral, count);
       elements.levelPicker.append(button);
     });
@@ -2534,7 +2593,8 @@ footer::after {
   }
 
   function selectLevel(nextIndex) {
-    if (nextIndex === state.levelIndex) return;
+    const nextLevel = BOARD_LEVELS[nextIndex];
+    if (!nextLevel || nextLevel.locked || nextIndex === state.levelIndex) return;
     state.levelIndex = nextIndex;
     renderLevelPicker();
     updateLevelSummary();
