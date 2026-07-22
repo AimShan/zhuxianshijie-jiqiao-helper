@@ -66,7 +66,16 @@
                   <span class="section-index">02</span>
                   <h2>机巧石数量</h2>
                 </div>
-                <button id="exampleButton" class="text-button" type="button">填入示例</button>
+                <div class="inventory-actions">
+                  <button
+                    id="clearInventoryButton"
+                    class="text-button"
+                    type="button"
+                    aria-label="清空所有机巧石数量"
+                    disabled
+                  >清空</button>
+                  <button id="exampleButton" class="text-button" type="button">填入示例</button>
+                </div>
               </div>
 
               <div id="shapeInventory" class="shape-inventory"></div>
@@ -160,5 +169,39 @@
 
     <script src="./solver-core.js"></script>
     <script src="./app.js"></script>
+    <script>
+      (function setupClearInventoryButton() {
+        "use strict";
+
+        const clearButton = document.querySelector("#clearInventoryButton");
+        const exampleButton = document.querySelector("#exampleButton");
+        const inventory = document.querySelector("#shapeInventory");
+        const solveButton = document.querySelector("#solveButton");
+
+        function inputs() {
+          return [...inventory.querySelectorAll("input[data-shape-id]")];
+        }
+
+        function syncClearButton() {
+          clearButton.disabled = inputs().every((input) => Number(input.value) === 0);
+        }
+
+        clearButton.addEventListener("click", () => {
+          inputs().forEach((input) => {
+            if (Number(input.value) === 0) return;
+            input.value = "0";
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+          solveButton.querySelector("span:nth-child(2)").textContent = "开始推演";
+          solveButton.querySelector("small").textContent = "生成铺满方案";
+          syncClearButton();
+        });
+
+        inventory.addEventListener("click", syncClearButton);
+        inventory.addEventListener("change", syncClearButton);
+        exampleButton.addEventListener("click", syncClearButton);
+        syncClearButton();
+      })();
+    </script>
   </body>
 </html>

@@ -87,14 +87,18 @@
     {
       level: 4,
       name: "引星",
-      cells: mergeCells(rectangle(1, 4, 0, 5), rectangle(0, 0, 1, 4)),
-      note: "28 格 · 格位待实图校准",
-      confirmed: false,
+      cells: mergeCells(rectangle(1, 4, 0, 5), rectangle(5, 5, 0, 3)),
+      note: "底部靠左新增 4 格 · 共 28 格",
+      confirmed: true,
     },
     {
       level: 5,
       name: "承光",
-      cells: mergeCells(rectangle(1, 4, 0, 5), rectangle(0, 0, 1, 4), rectangle(5, 5, 1, 4)),
+      cells: mergeCells(
+        rectangle(1, 4, 0, 5),
+        rectangle(5, 5, 0, 3),
+        rectangle(0, 0, 1, 4),
+      ),
       note: "32 格 · 格位待实图校准",
       confirmed: false,
     },
@@ -103,8 +107,9 @@
       name: "圆满",
       cells: mergeCells(
         rectangle(1, 4, 0, 5),
+        rectangle(5, 5, 0, 3),
         rectangle(0, 0, 1, 4),
-        rectangle(5, 6, 1, 4),
+        rectangle(6, 6, 1, 4),
       ),
       note: "36 格 · 格位待实图校准",
       confirmed: false,

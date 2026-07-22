@@ -1,5 +1,18 @@
 @import url("./styles-clarity.css");
 
+/* 库存快捷操作 */
+.inventory-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.text-button:disabled {
+  border-bottom-color: transparent;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* 桌面端边侧水印 */
 .app-shell::before,
 .app-shell::after {
